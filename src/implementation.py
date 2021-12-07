@@ -83,7 +83,7 @@ for i in range(8455, 8519):
     j += 1'''
 
 ## Build projector and camera matrices ##
-projector = []
+'''projector = []
 camera = []
 proj_dir = "../data/fixed_pattern/"
 cap_dir =  "../data/fixed_pattern_cap/"
@@ -95,15 +95,15 @@ for i in range(1, 65):
     cam_im = cv2.cvtColor(io.imread(cname), cv2.COLOR_RGB2GRAY)
     camera.append(process_im(cam_im, FIXED_PATTERN).flatten())
 projector = np.array(projector).T
-camera = np.array(camera)
+camera = np.array(camera)'''
 
 
 ## Calculate T matrix in segments ##
-dir_name = "../data/fixed_pattern_T/"
+'''dir_name = "../data/fixed_pattern_T/"
 if (not os.path.exists(dir_name)):
     os.mkdir(dir_name)
 for i in range(camera.shape[1]//(1024*16)):
     T = calculate_ltm(projector, camera[:, i*(1024*16):(i+1)*(1024*16)])
     fname = dir_name + "T" + str(i).zfill(2) + ".npy"
     np.save(fname, T)
-    del T
+    del T'''
