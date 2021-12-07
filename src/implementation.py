@@ -29,6 +29,10 @@ def generate_fixed_pattern(data_dir):
 def subdivide(pattern, captured, frame_order):
     pass
 
+io.imsave("../data/fixed_pattern/zero_im.jpg", np.zeros((512, 512)))
+io.imsave("../data/fixed_pattern/flooded.jpg", np.ones((512, 512)))
+
+
 '''j = 1
 for i in range(13, 77):
     fname = "../data/fixed_pattern_cap/DSC_" + str(i).zfill(4) + ".JPG"
@@ -38,4 +42,4 @@ for i in range(13, 77):
     io.imsave(new_name, im)
     j += 1'''
 
-generate_fixed_pattern("../data/fixed_pattern/")
+#generate_fixed_pattern("../data/fixed_pattern/")
