@@ -4,6 +4,11 @@ from skimage import io
 import matplotlib.pyplot as plt
 import cv2
 
+GRAYSCALE = 0
+RED = 1
+GREEN = 2
+BLUE = 3
+
 def generate_fixed_pattern(data_dir):
     if (not os.path.exists(data_dir)):
         os.mkdir(data_dir)
@@ -41,8 +46,33 @@ def generate_bar_scan(data_dir):
         res.append(im)
     return np.array(res)
 
+def build_matrix(data_dir, num_im, channel, suff):
+    mtx = []
+    for i in range(1, num_im + 1):
+        im = io.imread(data_dir + str(i).zfill(6) + suff)
+        if (channel == GRAYSCALE):
+            im = cv2.cvtColor(im, cv2.COLOR_RGB2GRAY).flatten()
+        elif (channel == RED):
+            im = im[:, :, 0].flatten()
+        elif (channel == GREEN):
+            im = im[:, :, 1].flatten()
+        elif (channel == BLUE):
+            im = im[:, :, 2].flatten()
+        else:
+            return None
+        mtx.append(im)
+    return np.array(mtx).T
+
+'''
+projector - (pq, k)
+camera - (j, k)
+
+C = TP
+C^T = P^T T^T
+'''
 def calculate_ltm(projector, camera):
-    pass
+    t, _, _, _ = np.linalg.lstsq(projector.T, camera.T, rcond=None) # (pq, j) rows of T
+    return t
     
 def get_virtual(T, virtual_light):
     pass
