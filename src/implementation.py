@@ -50,7 +50,9 @@ def build_matrix(data_dir, num_im, channel, suff):
     mtx = []
     for i in range(1, num_im + 1):
         im = io.imread(data_dir + str(i).zfill(6) + suff)
-        if (channel == GRAYSCALE):
+        if (len(im.shape) == 2):
+            im = im.flatten()
+        elif (channel == GRAYSCALE):
             im = cv2.cvtColor(im, cv2.COLOR_RGB2GRAY).flatten()
         elif (channel == RED):
             im = im[:, :, 0].flatten()
@@ -72,13 +74,10 @@ C^T = P^T T^T
 '''
 def calculate_ltm(projector, camera):
     t, _, _, _ = np.linalg.lstsq(projector.T, camera.T, rcond=None) # (pq, j) rows of T
-    return t
+    return t.T
     
 def get_virtual(T, virtual_light):
     pass
 
 def relight(T, light):
-    pass
-
-def calculate_ltm(projector, camera):
     pass
