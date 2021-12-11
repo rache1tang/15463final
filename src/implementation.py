@@ -76,6 +76,7 @@ def calculate_ltm(projector, camera):
     A = projector.T
     b = camera.T
     omp = OrthogonalMatchingPursuit(normalize=True)
+    omp.n_nonzero_coefs_ = 150
     omp.fit(A, b)
     return omp.coef_, omp.intercept_
 '''
