@@ -47,7 +47,7 @@ for i in range(8):
 
 
 ## Generate Virtual Image ##
-pattern = np.zeros((m, n))
+'''pattern = np.zeros((m, n))
 step_m = m//4
 step_n = n//4
 for i in range(0, m, step_m):
@@ -58,7 +58,7 @@ pattern = pattern / np.linalg.norm(pattern, axis=0)
 pattern = pattern.flatten()
 data_dir = "../data/fixed_pattern/T/"
 mn = m*n
-step = mn//8
+step = mn//8'''
 
 
 '''vi = np.zeros(p*q)
@@ -72,7 +72,7 @@ for i in range(mn//step):
 fname = "../data/fixed_pattern/checker.jpg"
 io.imsave(fname, vi.reshape(p, q))'''
 
-generated = np.zeros(m*n)
+'''generated = np.zeros(m*n)
 pattern = pattern.reshape(-1, 1)
 for i in range(mn//step):
     T = np.load(data_dir + "T" + str(i).zfill(2) + ".npy")
@@ -80,4 +80,4 @@ for i in range(mn//step):
     generated[i*step:(i+1)*step] = relight(T, pattern).flatten() + b
     print("Generated", i+1, "/", mn//step)
 fname = "../data/fixed_pattern/checker_relight.jpg"
-io.imsave(fname, generated.reshape(m, n))
+io.imsave(fname, generated.reshape(m, n))'''
