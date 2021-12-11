@@ -3,6 +3,8 @@ import os
 from skimage import io
 import matplotlib.pyplot as plt
 import cv2
+import pylops
+from sklearn.linear_model import OrthogonalMatchingPursuit
 
 GRAYSCALE = 0
 RED = 1
@@ -20,7 +22,7 @@ def generate_fixed_pattern(data_dir):
         for j in range(8):
             im = np.zeros((256, 256))
             im[i::8, j::8] = np.ones((32, 32))
-            io.imsave(data_dir + str(im_num).zfill(6) + ".jpg", im)
+            io.imsave(data_dir + str(im_num).zfill(6) + ".png", im)
             res.append(im)
             im_num += 1
     return np.array(res)
@@ -29,9 +31,9 @@ def generate_bernoulli(data_dir):
     if (not os.path.exists(data_dir)):
         os.mkdir(data_dir)
     res = []
-    for i in range(100):
+    for i in range(512):
         im = np.random.randint(2, size=(256, 256))
-        io.imsave(data_dir + str(i+1).zfill(6) + ".jpg", im)
+        io.imsave(data_dir + str(i+1).zfill(6) + ".png", im)
         res.append(im)
     return np.array(res)
 
@@ -42,7 +44,7 @@ def generate_bar_scan(data_dir):
     for i in range(128):
         im = np.zeros((256, 256))
         im[i*2:(i+1)*2, :] = np.ones((2, 256))
-        io.imsave(data_dir + str(i+1).zfill(6) + ".jpg", im)
+        io.imsave(data_dir + str(i+1).zfill(6) + ".png", im)
         res.append(im)
     return np.array(res)
 
@@ -51,6 +53,7 @@ def build_matrix(data_dir, num_im, channel, suff):
     for i in range(1, num_im + 1):
         im = io.imread(data_dir + str(i).zfill(6) + suff)
         if (len(im.shape) == 2):
+            im = np.where(im > 255/2, 1, 0)
             im = im.flatten()
         elif (channel == GRAYSCALE):
             im = cv2.cvtColor(im, cv2.COLOR_RGB2GRAY).flatten()
@@ -67,17 +70,20 @@ def build_matrix(data_dir, num_im, channel, suff):
 
 '''
 projector - (pq, k)
-camera - (j, k)
-
-C = TP
-C^T = P^T T^T
+camera - (mn, k)
 '''
 def calculate_ltm(projector, camera):
-    t, _, _, _ = np.linalg.lstsq(projector.T, camera.T, rcond=None) # (pq, j) rows of T
-    return t.T
-    
+    A = projector.T
+    b = camera.T
+    omp = OrthogonalMatchingPursuit(normalize=True)
+    omp.fit(A, b)
+    return omp.coef_, omp.intercept_
+'''
+T - (j, pq)
+virtual_light - (j, 1)
+'''
 def get_virtual(T, virtual_light):
-    pass
+    return T.T @ virtual_light
 
 def relight(T, light):
-    pass
+    return T @ light
