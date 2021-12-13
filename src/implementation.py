@@ -3,13 +3,17 @@ import os
 from skimage import io
 import matplotlib.pyplot as plt
 import cv2
-import pylops
-from sklearn.linear_model import OrthogonalMatchingPursuit
+from sklearn.linear_model import OrthogonalMatchingPursuit, orthogonal_mp
+import time
 
 GRAYSCALE = 0
 RED = 1
 GREEN = 2
 BLUE = 3
+
+OMP = "OMP"
+ROMP = "ROMP"
+LEAST_SQUARES = "lstsq"
 
 def generate_fixed_pattern(data_dir):
     if (not os.path.exists(data_dir)):
@@ -68,17 +72,34 @@ def build_matrix(data_dir, num_im, channel, suff):
         mtx.append(im)
     return np.array(mtx).T
 
+def calc_romp(projector, camera):
+    pass
+
 '''
 projector - (pq, k)
 camera - (mn, k)
 '''
-def calculate_ltm(projector, camera):
-    A = projector.T
-    b = camera.T
-    omp = OrthogonalMatchingPursuit(normalize=True)
-    omp.n_nonzero_coefs_ = 150
-    omp.fit(A, b)
-    return omp.coef_, omp.intercept_
+def calculate_ltm(projector, camera, method=OMP):
+    start = time.time()
+    if (method == OMP):
+        A = np.float32(projector.T)
+        b = np.float32(camera.T)
+        coef = orthogonal_mp(A, b, n_nonzero_coefs=150)
+    elif (method == LEAST_SQUARES):
+        coef, _, _, _ = np.linalg.lstsq(projector.T, camera.T, rcond=None)
+        for i in range(coef.shape[0]):
+            row = coef[i, :]
+            thresh = (-row).argsort()[150]
+            coef[i, :] = np.where(row >= thresh, row, 0)
+    elif (method == ROMP):
+        coef = calc_romp(projector, camera)
+    else:
+        mn, _ = camera.shape
+        pq, _ = projector.shape
+        coef = np.zeros((pq, mn))
+    print("Iteration took", (time.time() - start)/60, "minutes")
+    return coef.T
+    
 '''
 T - (j, pq)
 virtual_light - (j, 1)

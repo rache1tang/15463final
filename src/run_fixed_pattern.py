@@ -46,16 +46,14 @@ camera = build_matrix(cam_dir, num_patterns, GRAYSCALE, im_suffix)
 step = m*n//8
 
 for i in range(8):
-    T, b = calculate_ltm(proj, camera[i*step : (i+1)*step, :])
+    T= calculate_ltm(proj, camera[i*step : (i+1)*step, :])
     np.save(save_dir + "T" + str(i).zfill(2) + ".npy", T)
-    np.save(save_dir + "b" + str(i).zfill(2) + ".npy", b)
     del T
-    del b
     print("Done", (i+1), "/", 8)'''
 
 
 ## Generate Virtual Image ##
-pattern = np.zeros((m, n))
+'''pattern = np.zeros((m, n))
 step_m = m//4
 step_n = n//4
 for i in range(0, m, step_m):
@@ -66,26 +64,24 @@ pattern = pattern / np.linalg.norm(pattern, axis=0)
 pattern = pattern.flatten()
 data_dir = "../data/fixed_pattern/T/"
 mn = m*n
-step = mn//8
+step = mn//8'''
 
 
 '''vi = np.zeros(p*q)
 for i in range(mn//step):
     vl = pattern[i*step:(i+1)*step].reshape(-1, 1)
     T = np.load(data_dir + "T" + str(i).zfill(2) + ".npy")
-    b = np.load(data_dir + "b" + str(i).zfill(2) + ".npy")
-    vi[:] += get_virtual(T, vl - b.reshape(-1, 1)).flatten()
+    vi[:] += get_virtual(T, vl).flatten()
     print("Calculated", i + 1, "/", mn//step)
 
 fname = "../data/fixed_pattern/checker.jpg"
 io.imsave(fname, vi.reshape(p, q))'''
 
-generated = np.zeros(m*n)
+'''generated = np.zeros(m*n)
 pattern = pattern.reshape(-1, 1)
 for i in range(mn//step):
     T = np.load(data_dir + "T" + str(i).zfill(2) + ".npy")
-    b = np.load(data_dir + "b" + str(i).zfill(2) + ".npy")
-    generated[i*step:(i+1)*step] = relight(T, pattern).flatten() + b
+    generated[i*step:(i+1)*step] = relight(T, pattern).flatten()
     print("Generated", i+1, "/", mn//step)
 fname = "../data/fixed_pattern/checker_relight.jpg"
-io.imsave(fname, generated.reshape(m, n))
+io.imsave(fname, generated.reshape(m, n))'''

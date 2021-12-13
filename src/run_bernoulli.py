@@ -7,7 +7,7 @@ im_prefix = "IMG_"
 im_suffix = ".JPG"
 proj_suff = ".png"
 black_im_num = 411
-num_patterns = 512
+num_patterns = 450
 m, n, p, q = 256, 256, 256, 256
 
 left = 1253
@@ -157,22 +157,20 @@ for i in range(311, 513):
     im[:, :, 2] = np.hstack((im[:, :, 2], np.zeros((m, im_shift))))[:, im_shift:]
     io.imsave(fname, im)'''
 
-
 ## Calculate T ##
 '''save_dir = "../data/bernoulli/T/"
 if (not os.path.exists(save_dir)):
     os.mkdir(save_dir)
 
 proj = build_matrix(proj_dir, num_patterns, GRAYSCALE, proj_suff)
+proj = np.where(proj == 0, -1, 1)
 camera = build_matrix(cam_dir, num_patterns, GRAYSCALE, im_suffix)
 step = m*n//8
 
 for i in range(8):
-    T, b = calculate_ltm(proj, camera[i*step : (i+1)*step, :])
+    T = calculate_ltm(proj, camera[i*step : (i+1)*step, :])
     np.save(save_dir + "T" + str(i).zfill(2) + ".npy", T)
-    np.save(save_dir + "b" + str(i).zfill(2) + ".npy", b)
     del T
-    del b
     print("Done", (i+1), "/", 8)'''
 
 
@@ -195,19 +193,19 @@ step = mn//8'''
 for i in range(mn//step):
     vl = pattern[i*step:(i+1)*step].reshape(-1, 1)
     T = np.load(data_dir + "T" + str(i).zfill(2) + ".npy")
-    b = np.load(data_dir + "b" + str(i).zfill(2) + ".npy")
-    vi[:] += get_virtual(T, vl - b.reshape(-1, 1)).flatten()
+    lit = get_virtual(T, vl).flatten()
+    vi += lit
     print("Calculated", i + 1, "/", mn//step)
 
 fname = "../data/bernoulli/checker.jpg"
 io.imsave(fname, vi.reshape(p, q))'''
 
 '''generated = np.zeros(m*n)
+pattern = np.where(pattern == 0, -1, 1)
 pattern = pattern.reshape(-1, 1)
 for i in range(mn//step):
     T = np.load(data_dir + "T" + str(i).zfill(2) + ".npy")
-    b = np.load(data_dir + "b" + str(i).zfill(2) + ".npy")
-    generated[i*step:(i+1)*step] = relight(T, pattern).flatten() + b
+    generated[i*step:(i+1)*step] = relight(T, pattern).flatten()
     print("Generated", i+1, "/", mn//step)
 fname = "../data/bernoulli/checker_relight.jpg"
 io.imsave(fname, generated.reshape(m, n))'''
