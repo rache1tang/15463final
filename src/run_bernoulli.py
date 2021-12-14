@@ -158,7 +158,7 @@ for i in range(311, 513):
     io.imsave(fname, im)'''
 
 ## Calculate T ##
-'''save_dir = "../data/bernoulli/T/"
+save_dir = "../data/bernoulli/T/"
 if (not os.path.exists(save_dir)):
     os.mkdir(save_dir)
 
@@ -168,10 +168,10 @@ camera = build_matrix(cam_dir, num_patterns, GRAYSCALE, im_suffix)
 step = m*n//8
 
 for i in range(8):
-    T = calculate_ltm(proj, camera[i*step : (i+1)*step, :])
+    T = calculate_ltm(proj, camera[i*step : (i+1)*step, :], method=ROMP)
     np.save(save_dir + "T" + str(i).zfill(2) + ".npy", T)
     del T
-    print("Done", (i+1), "/", 8)'''
+    print("Done", (i+1), "/", 8)
 
 
 ## Generate Virtual Image ##

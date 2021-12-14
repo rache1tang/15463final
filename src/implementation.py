@@ -72,8 +72,58 @@ def build_matrix(data_dir, num_im, channel, suff):
         mtx.append(im)
     return np.array(mtx).T
 
+'''
+projector - (pq, k)
+camera - (mn, k)
+'''
 def calc_romp(projector, camera):
-    pass
+    K = 150 # sparsity
+    coef = np.zeros((projector.shape[0], camera.shape[0]))
+    for i in range(camera.shape[0]):
+        y = camera[i, :] # (k, )
+        r = y 
+        lam = []
+        t = 1
+        x = None
+        while (len(lam) < 2*K and t < K):
+            # Calculate largest nonzero coordinates or all nonzero coordinates
+            u = np.abs((projector @ r.reshape(-1, 1)).flatten())
+            non_zero = np.sum(np.where(u != 0, 1, 0))
+            if (non_zero < K):
+                J = u.nonzero()
+            else:
+                J = (-u).argsort()[:K]
+
+            # Regularization
+            energy_max = -1
+            J0 = []
+            for j in range(len(J)):
+                J0_tmp = []
+                en = u[J[j]] ** 2
+                for jj in range(j, len(J)):
+                    if (u[J[j]] < 2 * u[J[jj]]):
+                        J0_tmp.append(J[jj])
+                        en += u[J[jj]] ** 2 
+                    else:
+                        break
+                if en > energy_max:
+                    energy_max = en
+                    J0 = J0_tmp
+            J0 = np.array(J0)
+            # Update
+            lam.extend(J0)
+            if (len(lam) > projector.shape[1]):
+                break
+            proj = np.zeros_like(projector)
+            proj[lam, :] = projector[lam, :]
+            x, _, _, _ = np.linalg.lstsq(proj.T, y, rcond=None)
+            r = proj.T @ x.reshape(-1, 1)
+            r = y - r.flatten()
+            print("Done iter", t)
+            t += 1
+        coef[:, i] = x
+    return coef
+                
 
 '''
 projector - (pq, k)
