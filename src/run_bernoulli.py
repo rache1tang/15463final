@@ -158,7 +158,7 @@ for i in range(311, 513):
     io.imsave(fname, im)'''
 
 ## Calculate T ##
-save_dir = "../data/bernoulli/T/"
+'''save_dir = "../data/bernoulli/T_lstsq/"
 if (not os.path.exists(save_dir)):
     os.mkdir(save_dir)
 
@@ -168,14 +168,14 @@ camera = build_matrix(cam_dir, num_patterns, GRAYSCALE, im_suffix)
 step = m*n//8
 
 for i in range(8):
-    T = calculate_ltm(proj, camera[i*step : (i+1)*step, :], method=ROMP)
+    T = calculate_ltm(proj, camera[i*step : (i+1)*step, :], method=LEAST_SQUARES)
     np.save(save_dir + "T" + str(i).zfill(2) + ".npy", T)
     del T
-    print("Done", (i+1), "/", 8)
+    print("Done", (i+1), "/", 8)'''
 
 
 ## Generate Virtual Image ##
-'''pattern = np.zeros((m, n))
+pattern = np.zeros((m, n))
 step_m = m//4
 step_n = n//4
 for i in range(0, m, step_m):
@@ -184,9 +184,9 @@ for i in range(0, m, step_m):
             pattern[i:i+step_m, j:j+step_n] = np.ones((step_m, step_n))
 pattern = pattern / np.linalg.norm(pattern, axis=0)
 pattern = pattern.flatten()
-data_dir = "../data/bernoulli/T/"
+data_dir = "../data/bernoulli/T_lstsq/"
 mn = m*n
-step = mn//8'''
+step = mn//8
 
 
 '''vi = np.zeros(p*q)
@@ -197,7 +197,7 @@ for i in range(mn//step):
     vi += lit
     print("Calculated", i + 1, "/", mn//step)
 
-fname = "../data/bernoulli/checker.jpg"
+fname = "../data/bernoulli/checker_lstsq.jpg"
 io.imsave(fname, vi.reshape(p, q))'''
 
 '''generated = np.zeros(m*n)
@@ -207,5 +207,5 @@ for i in range(mn//step):
     T = np.load(data_dir + "T" + str(i).zfill(2) + ".npy")
     generated[i*step:(i+1)*step] = relight(T, pattern).flatten()
     print("Generated", i+1, "/", mn//step)
-fname = "../data/bernoulli/checker_relight.jpg"
+fname = "../data/bernoulli/checker_relight_lstsq.jpg"
 io.imsave(fname, generated.reshape(m, n))'''
